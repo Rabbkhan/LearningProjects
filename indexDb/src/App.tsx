@@ -120,6 +120,22 @@ try {
 
   const deleteData = async () => {
 
+ try {
+     const db = await dbConnect();
+    const tx = db.transaction("users", "readwrite");
+    const store = tx.objectStore("users")
+    const request = store.delete(11)
+request.onsuccess = () => {
+  toast.success("Data deleted successfully!")
+}
+request.onerror = () => {
+  toast.error("Error deleting data!")
+}  
+ } catch (error) {
+  toast.error("Error deleting data!")
+ } 
+
+
   }
 
   return (

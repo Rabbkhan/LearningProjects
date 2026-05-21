@@ -89,7 +89,32 @@ const [status, setStatus] = useState("idle");
 
 
   const updateData = async () => {
-
+try {
+  const db = await dbConnect();
+  const tx = db.transaction("users", "readwrite");
+  const store = tx.objectStore("users")
+  const request = store.get(11)
+  request.onsuccess = () =>{
+    const data = request.result;
+    if(data){
+      data.name = "khan"
+      const updateRequest = store.put(data)
+      updateRequest.onsuccess = () => {
+        toast.success("Data updated successfully!")
+      }
+      updateRequest.onerror = () => {
+        toast.error("Error updating data!")
+      }
+    }else{
+      toast.error("Data not found!")
+    }
+  }
+   request.onerror = () => {
+    toast.error("Error fetching data for update!")
+  }   
+} catch (error) {
+  toast.error("Error updating data!")
+}
   }
 
 

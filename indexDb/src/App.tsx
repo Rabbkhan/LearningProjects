@@ -1,3 +1,6 @@
+import React, { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const DB_NAME = "testDB";
 const version = 1;
@@ -5,9 +8,10 @@ const version = 1;
 
 const App = () => {
 
+const [status, setStatus] = useState("idle");
 
 
-  const dbConnect = () => {
+  const dbConnect = ():Promise<IDBDatabase> => {
     // alert("Database Connected");
 
     return new Promise((resolve, reject) => {
@@ -33,12 +37,90 @@ const App = () => {
 
     })
   }
+
+
+  const storeData = async () => {
+
+    try {
+      const db = await dbConnect();
+      const tx = db.transaction("users", "readwrite");
+      const payload = {
+        name: "John Doe",
+        email: "john@gmail.com"
+      }
+
+      const store = tx.objectStore("users")
+      const request = store.add(payload)
+      request.onsuccess = () => {
+        toast.success("Data stored successfully!")
+      }
+       request.onerror = () => {
+      toast.error("Error storing data!")
+    }
+    }
+    catch (error) {
+         toast.error("Error storing data!")
+
+
+    }
+  }
+
+
+  const fetchData = async () => {
+
+    try {
+      const db = await dbConnect();
+      const tx = db.transaction("users", "readonly");
+      const store = tx.objectStore("users")
+      const request = store.getAll()
+      request.onsuccess = () =>{
+        console.log(request.result);
+        
+      }
+      request.onerror =()=>{
+        console.log(request.result);
+        
+      }
+
+    } catch (error) {
+      toast.error("Error fetching data!")
+    }
+  }
+
+
+  const updateData = async () => {
+
+  }
+
+
+  const deleteData = async () => {
+
+  }
+
   return (
 
 
-    <div className="p-16">
 
-      <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={dbConnect}>Connect to Database</button>
+    <div className="p-16 space-y-4">
+      <ToastContainer position="top-right" autoClose={3000} />
+
+      <div className="flex flex-wrap gap-3">
+        <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={storeData}>
+          Store Data
+        </button>
+        <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={fetchData}>
+          Fetch Data
+        </button>
+        <button className="bg-yellow-500 text-white px-4 py-2 rounded" onClick={updateData}>
+          Update Data
+        </button>
+        <button className="bg-red-500 text-white px-4 py-2 rounded" onClick={deleteData}>
+          Delete Data
+        </button>
+      </div>
+      <div className="rounded border border-slate-300 bg-slate-50 p-4 text-slate-800">
+        <strong>Status:</strong> {status}
+      </div>
 
 
     </div>

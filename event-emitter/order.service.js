@@ -1,10 +1,13 @@
-export class OrderService {
+
+import { EventEmitter } from 'node:events';
+
+export class OrderService extends EventEmitter {
 
 
-constructor(emailService, inventoryService){
-this.emailService = emailService,
-this.inventoryService = inventoryService
-}
+// constructor(emailService, inventoryService){
+// this.emailService = emailService,
+// this.inventoryService = inventoryService
+// }
 
 
     createOrder (orderData){
@@ -13,8 +16,10 @@ this.inventoryService = inventoryService
 
 // if success
 
-this.emailService.sendEmail(orderData)
-this.inventoryService.updateInventory (orderData)
+
+this.emit('order:Created', orderData) // event emitted with order data
+// this.emailService.sendEmail(orderData)
+// this.inventoryService.updateInventory (orderData)
 
 return {id: Date.now().toString(), ...orderData}
 
